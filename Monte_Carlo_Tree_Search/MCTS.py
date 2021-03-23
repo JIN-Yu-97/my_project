@@ -1,5 +1,18 @@
 # -*- coding: utf-8 -*-
 # author：Kyle time:16/3/2021
+"""
+With this package, you can easily
+1. do simulation and build a Monte Carlo Tree -> define an MCtreeSearch object, and call simulate()
+2. save the tree -> call save_tree()
+3. load the pre-built tree -> call load_tree()
+4. continue to do simulation and develop the previous tree -> call simulation()
+5. give solutions based on the simulation -> call find_solution() and print_solution()
+
+What you need to do:
+1. define a react function
+2. define a reward function
+"""
+
 import json
 import math
 import numpy as np
@@ -33,7 +46,7 @@ class MCtreeSearch:
         self.decision_set = decision_set  # list
         self.n = len(self.decision_set)
         self.depth = depth  # int, how many decisions to make
-        self.initial_depth = initial_depth
+        self.initial_depth = initial_depth  # start simulation from the ith decision
         self.initial_state = initial_state  # tuple
         self.final_state = final_state  # tuple
         self.C = ucb_param  # hyperparameter for UCB
@@ -87,7 +100,7 @@ class MCtreeSearch:
 
     def expand(self, depth, state):
         idx = len(self.tree[depth, 's'])
-        self.tree[depth, 's'][state] = [idx, 0]  # id and visit times
+        self.tree[depth, 's'][state] = [idx, 0]  # [id, visit_times]
         if (depth + 1, 'd') not in self.tree.keys():
             self.tree[depth + 1, 'd'] = dict()
         for i in range(idx * self.n, idx * self.n + self.n):
@@ -116,7 +129,7 @@ class MCtreeSearch:
                 decision_id = i
         return decision_id
 
-    def ucb(self, depth, idx, N):  # N is visit times of the parent node
+    def ucb(self, depth, idx, N):  # N is visit_times of the parent node
         if self.tree[depth, 'd'][idx]['visit_times'] == 0:
             return np.inf
         else:
